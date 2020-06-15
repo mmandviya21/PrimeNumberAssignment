@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using PrimeNumberClassLibrary;
 
 namespace PrimeNumberAssignment
 {
-    class Program
+    public class Program
     {
         
         static List<int> lstFilteredPrimeNumbers = new List<int>();
-
-        static List<int> lstFirstTenPrimeNumbers = new List<int>();
-
+        static PrimeNumberFilter objPrimeNumberFilter = new PrimeNumberFilter();
 
         static void Main(string[] args)
         {
             try
-            {
-                
-                string strTitle = "Prime numbers to be displayed: ";
+            {                
+                Console.ForegroundColor = ConsoleColor.White;                
+                string strTitle = "Input Prime number count to be displayed: ";
                 Console.WriteLine(strTitle);
                 Console.SetCursorPosition(strTitle.Length, Console.CursorTop - 1);
                 string strPrimeNumberstobedisplayed = Console.ReadLine();
 
-                if (IsUserInputValid(strPrimeNumberstobedisplayed))
+                // Validate input parameter
+                if (objPrimeNumberFilter.IsUserInputValid(strPrimeNumberstobedisplayed))
                 {
-                    FilterPrimeNumbers(Convert.ToInt16(strPrimeNumberstobedisplayed));
+                    PrimeNumberOutput(Convert.ToInt16(strPrimeNumberstobedisplayed));
                 }
                 else
                 {
@@ -38,121 +38,52 @@ namespace PrimeNumberAssignment
             }
         }
 
-        /*This method filters prime numbers as per input parameter and displays table of every filtered Prime Number */
-        public static void FilterPrimeNumbers(int intPrimeNumberToBeDisplayed)
+        /* MethodName: PrimeNumberOutput
+           Medhod Description: Method filters prime numbers as per input parameter and displays table of every Prime Number
+           Input Parameter: Integer value (Prime number count to be displayed)
+           Output : None          
+        */
+        public static void PrimeNumberOutput(int intPrimeNumberToBeDisplayed)
         {
-            
-            string strPrimeNumbers = "First " + intPrimeNumberToBeDisplayed.ToString() + " prime numbers: ";
-                        
-                int intPrimeNumberCount = 0;
-                
-                // SequenceNumber is increamental value from 0 
-                int intNumberSequence = 0;
-                
-                /*Identify number of prime numbers as per user input and store in stringbuilder object*/
-                while (intPrimeNumberCount < intPrimeNumberToBeDisplayed)
-                {
-                    if (IsPrime(intNumberSequence))
-                    {
-                        strPrimeNumbers += " " + intNumberSequence;
-                        lstFilteredPrimeNumbers.Add(intNumberSequence);
-                        lstFirstTenPrimeNumbers.Add(intNumberSequence);
-                    intPrimeNumberCount++;
-                    }
-                    intNumberSequence++;
-                }
+            string strPrimeNumbers = "Multiplication table of " + intPrimeNumberToBeDisplayed.ToString() + " Prime Numbers";
 
-                if(lstFirstTenPrimeNumbers.Count != 10)
-                {
-                   while (lstFirstTenPrimeNumbers.Count < 10)
-                   {
-                       if (IsPrime(intNumberSequence))
-                       {
-                         lstFirstTenPrimeNumbers.Add(intNumberSequence);                        
-                       }
-                    intNumberSequence++;
-                   }
-                 }
-                
-               Console.WriteLine();
-               Console.Write(strPrimeNumbers);
-               Console.WriteLine();
-               Console.Write("Table of above prime numbers");
-               Console.WriteLine();
+            Console.WriteLine();                
+            Console.Write(strPrimeNumbers);
+            Console.WriteLine();
 
-            DisplayResult(lstFilteredPrimeNumbers);
+            // Get Filtered Prime number as per user input
+            lstFilteredPrimeNumbers = objPrimeNumberFilter.GetFilteredPrimeNumber(intPrimeNumberToBeDisplayed);
+               
+            // This code will display multiplication table of filtered Prime Number.
+            int intPrimeNumber = 0;
+               Console.WriteLine("{0} {1,5}", "Prime Number ", "Multiplacation Table");
+               for (int i = 0; i <= lstFilteredPrimeNumbers.Count - 1; i++)
+               {
+                   intPrimeNumber = lstFilteredPrimeNumbers[i];                
+                   Console.WriteLine("{0,-12} {1,5}", intPrimeNumber.ToString(), GetPrimeNumberTable(intPrimeNumber));
+               }
+
                lstFilteredPrimeNumbers.Clear();
-               Console.WriteLine();
-               Console.WriteLine();                            
+               Console.WriteLine();               
                Main(null);
         }
+        
 
-        /* This method displays table of each Prime Number passed in input integer List */
-        private static void DisplayResult(List<int> lstFilteredPrimeNumbers)
-        {
-
-            int intPrimeNumber = 0;
-            string strPrimeNumberTable = "";
-
-            for (int i = 0; i <= lstFilteredPrimeNumbers.Count - 1; i++)
-            {
-                intPrimeNumber = lstFilteredPrimeNumbers[i];
-                strPrimeNumberTable = intPrimeNumber + " | " + GetPrimeNumberTable(intPrimeNumber);
-                Console.WriteLine(strPrimeNumberTable);                
-                strPrimeNumberTable = "";            }            
-        }
-
-        /* This method Populates table of PrimeNumber */
+        /* MethodName: GetPrimeNumberTable
+           Medhod Description: This method returns multiplication table of input Prime Number.
+           Input Parameter: Integer value (Prime number)
+           Output string : Space separated multiplication table of (input Prime number)          
+        */
         private static string GetPrimeNumberTable(int intPrimeNumber)
         {
-            string strPrimeNumberTable = "";
+            string strPrimeNumberTable = "";                  
 
-            //for (int i = 1; i <= 10; i++)
-            //{
-            //    strPrimeNumberTable = strPrimeNumberTable + " " + (intPrimeNumber * i).ToString();
-            //}            
-
-            for (int i = 0; i < lstFirstTenPrimeNumbers.Count; i++)
+            for (int i = 0; i < lstFilteredPrimeNumbers.Count; i++)
             {
-                strPrimeNumberTable = strPrimeNumberTable + " " + (intPrimeNumber * lstFirstTenPrimeNumbers[i]).ToString();
-            }
-            
+                strPrimeNumberTable = strPrimeNumberTable + " " + (intPrimeNumber * lstFilteredPrimeNumbers[i]).ToString();
+            }            
 
             return strPrimeNumberTable;
-        }
-
-        /*This method verifies input ineger value is Prime number or not.*/
-        public static bool IsPrime(int number)
-        {
-            if (number <= 1) return false;
-            if (number == 2) return true;
-            if (number % 2 == 0) return false;
-
-            var boundary = (int)Math.Floor(Math.Sqrt(number));
-
-            for (int i = 3; i <= boundary; i += 2)
-                if (number % i == 0)
-                    return false;
-
-            return true;
-        }
-
-        /*This method validates input variable is integer and greater than 0.*/
-        static Boolean IsUserInputValid(string primeNumbertobedisplayed)
-        {
-            Boolean blnResult = false;
-            
-            int intInputValue;
-            
-            if (Int32.TryParse(primeNumbertobedisplayed, out intInputValue))
-            {                
-                if (intInputValue > 0)
-                {
-                    blnResult = true;
-                }
-            }
-
-            return blnResult;
         }
     }
 }
